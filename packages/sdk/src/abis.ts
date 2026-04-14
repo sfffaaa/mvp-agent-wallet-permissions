@@ -67,6 +67,12 @@ export const PERMISSION_MANAGER_ABI = [
     outputs: [],
     stateMutability: "nonpayable",
   },
+  { type: "error", name: "NotAuthorized", inputs: [] },
+  { type: "error", name: "PermissionExpired", inputs: [] },
+  { type: "error", name: "ExceedsPerTxLimit", inputs: [] },
+  { type: "error", name: "ExceedsDailyLimit", inputs: [] },
+  { type: "error", name: "ContractNotAllowed", inputs: [] },
+  { type: "error", name: "SelectorNotAllowed", inputs: [] },
 ] as const;
 
 export const AGENT_EXECUTOR_ABI = [
