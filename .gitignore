@@ -6,3 +6,7 @@ packages/contracts/lib/
 coverage/
 packages/**/*.js
 packages/**/*.d.ts
+.env
+.env.*
+*.log
+.DS_Store
