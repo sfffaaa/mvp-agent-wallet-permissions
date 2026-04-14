@@ -1,0 +1,10 @@
+{
+  "name": "mvp-agent-wallet-permissions",
+  "private": true,
+  "workspaces": ["packages/sdk", "demo"],
+  "scripts": {
+    "test:contracts": "cd packages/contracts && forge test -vv",
+    "test:sdk": "npm test --workspace=packages/sdk",
+    "test": "npm run test:contracts && npm run test:sdk"
+  }
+}

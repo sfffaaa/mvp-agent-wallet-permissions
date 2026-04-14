@@ -1,0 +1,8 @@
+node_modules/
+dist/
+packages/contracts/out/
+packages/contracts/cache/
+packages/contracts/lib/
+coverage/
+packages/**/*.js
+packages/**/*.d.ts
