@@ -8,6 +8,15 @@ contract AgentExecutor {
 
     PermissionManager public immutable permissionManager;
 
+    bool private _locked;
+
+    modifier nonReentrant() {
+        require(!_locked, "reentrant");
+        _locked = true;
+        _;
+        _locked = false;
+    }
+
     constructor(address _permissionManager) {
         permissionManager = PermissionManager(_permissionManager);
     }
@@ -17,7 +26,7 @@ contract AgentExecutor {
         address target,
         bytes calldata data,
         uint256 value
-    ) external payable returns (bytes memory) {
+    ) external nonReentrant returns (bytes memory) {
         bytes4 selector = data.length >= 4 ? bytes4(data[:4]) : bytes4(0);
 
         permissionManager.checkAndRecord(owner, msg.sender, target, selector, value);
