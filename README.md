@@ -78,6 +78,13 @@ agent  → execute()         → AgentExecutor.sol
                            → target.call()
 ```
 
+## Known MVP Limitations
+
+- **Spend limits cover `msg.value` only** — ERC-20 transfers, approvals, and other token movements are not bounded by `spendingLimitPerTx`/`spendingLimitDaily`.
+- **Contract + selector checked independently** — if contracts `[A, B]` and selectors `[foo, bar]` are allowed, the agent can call `foo` or `bar` on either contract. Production systems should allowlist `(contract, selector)` pairs.
+- **ETH is pooled in AgentExecutor** — the executor holds a shared ETH balance; asset segregation per owner is not enforced.
+- **Revocation is mempool-raceable** — a watching agent can front-run a pending revoke or tighter grant with one final execution under the old rules.
+
 ## Standards
 
 - [ERC-7715: Grant Permissions from Wallets](https://eips.ethereum.org/EIPS/eip-7715)
