@@ -21,6 +21,8 @@ contract AgentExecutor {
         permissionManager = PermissionManager(_permissionManager);
     }
 
+    receive() external payable {}
+
     function execute(
         address owner,
         address target,

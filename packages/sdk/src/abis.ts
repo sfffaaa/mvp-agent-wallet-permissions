@@ -82,4 +82,11 @@ export const AGENT_EXECUTOR_ABI = [
     outputs: [{ name: "", type: "bytes" }],
     stateMutability: "nonpayable",
   },
+  { type: "error", name: "ExecutionFailed", inputs: [] },
+  { type: "error", name: "NotAuthorized", inputs: [] },
+  { type: "error", name: "PermissionExpired", inputs: [] },
+  { type: "error", name: "ExceedsPerTxLimit", inputs: [] },
+  { type: "error", name: "ExceedsDailyLimit", inputs: [] },
+  { type: "error", name: "ContractNotAllowed", inputs: [] },
+  { type: "error", name: "SelectorNotAllowed", inputs: [] },
 ] as const;
