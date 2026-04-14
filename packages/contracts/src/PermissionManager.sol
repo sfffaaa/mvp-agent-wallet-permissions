@@ -29,6 +29,8 @@ contract PermissionManager {
     function grantPermission(address agent, Permission calldata p) external {
         _permissions[msg.sender][agent] = p;
         _permissions[msg.sender][agent].active = true;
+        _permissions[msg.sender][agent].spentToday = 0;
+        _permissions[msg.sender][agent].dayReset = block.timestamp;
         emit PermissionGranted(msg.sender, agent);
     }
 
