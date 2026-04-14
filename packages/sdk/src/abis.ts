@@ -73,6 +73,22 @@ export const PERMISSION_MANAGER_ABI = [
   { type: "error", name: "ExceedsDailyLimit", inputs: [] },
   { type: "error", name: "ContractNotAllowed", inputs: [] },
   { type: "error", name: "SelectorNotAllowed", inputs: [] },
+  { type: "error", name: "InvalidExpiry", inputs: [] },
+  { type: "error", name: "ExecutorAlreadySet", inputs: [] },
+  {
+    type: "function",
+    name: "setExecutor",
+    inputs: [{ name: "_executor", type: "address" }],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
+    name: "executor",
+    inputs: [],
+    outputs: [{ name: "", type: "address" }],
+    stateMutability: "view",
+  },
 ] as const;
 
 export const AGENT_EXECUTOR_ABI = [

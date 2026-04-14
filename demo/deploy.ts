@@ -37,5 +37,14 @@ export async function deployContracts() {
   const exReceipt = await publicClient.waitForTransactionReceipt({ hash: exHash });
   const exAddress = exReceipt.contractAddress!;
 
+  // Authorize AgentExecutor as the only caller of checkAndRecord
+  const setExHash = await walletClient.writeContract({
+    address: pmAddress,
+    abi: pmArtifact.abi,
+    functionName: "setExecutor",
+    args: [exAddress],
+  });
+  await publicClient.waitForTransactionReceipt({ hash: setExHash });
+
   return { pmAddress, exAddress };
 }

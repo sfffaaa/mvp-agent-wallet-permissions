@@ -8,6 +8,8 @@ contract PermissionManager {
     error ExceedsDailyLimit();
     error ContractNotAllowed();
     error SelectorNotAllowed();
+    error InvalidExpiry();
+    error ExecutorAlreadySet();
 
     struct Permission {
         uint256 spendingLimitPerTx;
@@ -22,11 +24,21 @@ contract PermissionManager {
 
     mapping(address => mapping(address => Permission)) private _permissions;
 
+    // Only the registered executor may call checkAndRecord.
+    // Set once after deploying AgentExecutor.
+    address public executor;
+
     event PermissionGranted(address indexed owner, address indexed agent);
     event PermissionRevoked(address indexed owner, address indexed agent);
     event SpendRecorded(address indexed owner, address indexed agent, uint256 value);
 
+    function setExecutor(address _executor) external {
+        if (executor != address(0)) revert ExecutorAlreadySet();
+        executor = _executor;
+    }
+
     function grantPermission(address agent, Permission calldata p) external {
+        if (p.expiry <= block.timestamp) revert InvalidExpiry();
         _permissions[msg.sender][agent] = p;
         _permissions[msg.sender][agent].active = true;
         _permissions[msg.sender][agent].spentToday = 0;
@@ -50,6 +62,8 @@ contract PermissionManager {
         bytes4 selector,
         uint256 value
     ) external {
+        if (msg.sender != executor) revert NotAuthorized();
+
         Permission storage p = _permissions[owner][agent];
 
         if (!p.active) revert NotAuthorized();

@@ -37,6 +37,7 @@ contract AgentExecutorTest is Test {
     function setUp() public {
         pm = new PermissionManager();
         executor = new AgentExecutor(address(pm));
+        pm.setExecutor(address(executor));
         target = new MockTarget();
         vm.deal(address(executor), 10 ether);
     }

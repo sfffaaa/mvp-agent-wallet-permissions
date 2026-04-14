@@ -13,6 +13,8 @@ contract PermissionManagerTest is Test {
 
     function setUp() public {
         pm = new PermissionManager();
+        // Test contract acts as the executor so it can call checkAndRecord directly
+        pm.setExecutor(address(this));
         vm.warp(1_000_000);
     }
 
@@ -53,14 +55,12 @@ contract PermissionManagerTest is Test {
     function test_checkAndRecord_success_records_spend() public {
         vm.prank(owner);
         pm.grantPermission(agent, _perm());
-        vm.prank(agent);
         pm.checkAndRecord(owner, agent, target, selector, 0.05 ether);
         PermissionManager.Permission memory p = pm.getPermission(owner, agent);
         assertEq(p.spentToday, 0.05 ether);
     }
 
     function test_checkAndRecord_revert_notAuthorized() public {
-        vm.prank(agent);
         vm.expectRevert(PermissionManager.NotAuthorized.selector);
         pm.checkAndRecord(owner, agent, target, selector, 0.05 ether);
     }
@@ -69,7 +69,6 @@ contract PermissionManagerTest is Test {
         vm.prank(owner);
         pm.grantPermission(agent, _perm());
         vm.warp(block.timestamp + 2 hours);
-        vm.prank(agent);
         vm.expectRevert(PermissionManager.PermissionExpired.selector);
         pm.checkAndRecord(owner, agent, target, selector, 0.05 ether);
     }
@@ -77,7 +76,6 @@ contract PermissionManagerTest is Test {
     function test_checkAndRecord_revert_exceedsPerTxLimit() public {
         vm.prank(owner);
         pm.grantPermission(agent, _perm());
-        vm.prank(agent);
         vm.expectRevert(PermissionManager.ExceedsPerTxLimit.selector);
         pm.checkAndRecord(owner, agent, target, selector, 0.2 ether);
     }
@@ -86,10 +84,8 @@ contract PermissionManagerTest is Test {
         vm.prank(owner);
         pm.grantPermission(agent, _perm());
         for (uint i = 0; i < 5; i++) {
-            vm.prank(agent);
             pm.checkAndRecord(owner, agent, target, selector, 0.1 ether);
         }
-        vm.prank(agent);
         vm.expectRevert(PermissionManager.ExceedsDailyLimit.selector);
         pm.checkAndRecord(owner, agent, target, selector, 0.05 ether);
     }
@@ -97,7 +93,6 @@ contract PermissionManagerTest is Test {
     function test_checkAndRecord_revert_contractNotAllowed() public {
         vm.prank(owner);
         pm.grantPermission(agent, _perm());
-        vm.prank(agent);
         vm.expectRevert(PermissionManager.ContractNotAllowed.selector);
         pm.checkAndRecord(owner, agent, address(0x999), selector, 0.05 ether);
     }
@@ -106,7 +101,6 @@ contract PermissionManagerTest is Test {
         vm.prank(owner);
         pm.grantPermission(agent, _perm());
         bytes4 bad = bytes4(keccak256("badFn()"));
-        vm.prank(agent);
         vm.expectRevert(PermissionManager.SelectorNotAllowed.selector);
         pm.checkAndRecord(owner, agent, target, bad, 0.05 ether);
     }
@@ -117,11 +111,9 @@ contract PermissionManagerTest is Test {
         vm.prank(owner);
         pm.grantPermission(agent, p);
         for (uint i = 0; i < 4; i++) {
-            vm.prank(agent);
             pm.checkAndRecord(owner, agent, target, selector, 0.1 ether);
         }
         vm.warp(block.timestamp + 1 days + 1);
-        vm.prank(agent);
         pm.checkAndRecord(owner, agent, target, selector, 0.1 ether);
         PermissionManager.Permission memory updated = pm.getPermission(owner, agent);
         assertEq(updated.spentToday, 0.1 ether);
