@@ -4,5 +4,11 @@ const config: Config = {
   testEnvironment: "node",
   testMatch: ["**/test/**/*.test.ts"],
   forceExit: true,
+  moduleNameMapper: {
+    "^(\\.{1,2}/.*)\\.js$": "$1",
+  },
+  transform: {
+    "^.+\\.tsx?$": ["ts-jest", { diagnostics: false }],
+  },
 };
 export default config;
