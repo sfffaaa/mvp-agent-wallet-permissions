@@ -35,6 +35,13 @@ contract PermissionManagerTest is Test {
         });
     }
 
+    function test_setExecutor_revert_nonDeployer() public {
+        PermissionManager pm2 = new PermissionManager();
+        vm.prank(address(0xdead));
+        vm.expectRevert(PermissionManager.NotAuthorized.selector);
+        pm2.setExecutor(address(this));
+    }
+
     function test_grantPermission_stores_permission() public {
         vm.prank(owner);
         pm.grantPermission(agent, _perm());

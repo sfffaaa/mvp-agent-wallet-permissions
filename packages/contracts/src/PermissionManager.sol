@@ -27,12 +27,18 @@ contract PermissionManager {
     // Only the registered executor may call checkAndRecord.
     // Set once after deploying AgentExecutor.
     address public executor;
+    address private immutable _deployer;
 
     event PermissionGranted(address indexed owner, address indexed agent);
     event PermissionRevoked(address indexed owner, address indexed agent);
     event SpendRecorded(address indexed owner, address indexed agent, uint256 value);
 
+    constructor() {
+        _deployer = msg.sender;
+    }
+
     function setExecutor(address _executor) external {
+        if (msg.sender != _deployer) revert NotAuthorized();
         if (executor != address(0)) revert ExecutorAlreadySet();
         executor = _executor;
     }

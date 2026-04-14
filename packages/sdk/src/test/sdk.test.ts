@@ -27,6 +27,32 @@ describe("grantPermission", () => {
     );
   });
 
+  it("rejects expiry in milliseconds", async () => {
+    const wallet = makeMockWallet();
+    await expect(
+      grantPermission(wallet, PM_ADDRESS, AGENT_ADDRESS, {
+        spendingLimitPerTx: parseEther("0.1"),
+        spendingLimitDaily: parseEther("0.5"),
+        expiry: BigInt(Date.now()), // milliseconds — should be rejected
+        allowedContracts: [],
+        allowedSelectors: [],
+      })
+    ).rejects.toThrow("milliseconds");
+  });
+
+  it("rejects expiry in the past", async () => {
+    const wallet = makeMockWallet();
+    await expect(
+      grantPermission(wallet, PM_ADDRESS, AGENT_ADDRESS, {
+        spendingLimitPerTx: parseEther("0.1"),
+        spendingLimitDaily: parseEther("0.5"),
+        expiry: BigInt(Math.floor(Date.now() / 1000) - 1), // 1 second ago
+        allowedContracts: [],
+        allowedSelectors: [],
+      })
+    ).rejects.toThrow("past");
+  });
+
   it("rejects if writeContract throws", async () => {
     const wallet = {
       writeContract: jest.fn().mockRejectedValue(new Error("reverted")),
